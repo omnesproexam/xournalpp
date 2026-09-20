@@ -401,14 +401,6 @@ void on_open_files(GApplication* application, gpointer f, gint numFiles, gchar* 
     }
 
     const fs::path p = Util::fromGFile(files[0]);
-    const std::string pathString = p.string();
-
-    if (pathString.find("xournalexam:") != std::string::npos) {
-        XojMsgBox::showErrorToUser(
-                GTK_WINDOW(app_data->win->getWindow()),
-                "MoodleExam-Aufruf erkannt:\n" + pathString);
-        return;
-    }
     
     try {
         if (fs::exists(p)) {
