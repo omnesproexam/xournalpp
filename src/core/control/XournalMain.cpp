@@ -452,21 +452,19 @@ void on_startup(GApplication* application, XMPtr app_data) {
     // Do we want stuff in gtk_application_set_app_menu?
 
     app_data->win->show(nullptr);
-
+    
     fs::path p;
-    if (app_data->optFilename) {
-        if (g_strv_length(app_data->optFilename) != 1) {
-            const std::string msg = _("Sorry, Xournal++ can only open one file at once.\n"
-                                      "Others are ignored.");
-            XojMsgBox::showErrorToUser(GTK_WINDOW(app_data->win->getWindow()), msg);
-        }
-        p = Util::fromGFilename(app_data->optFilename[0]);
-        try {
-            p = fs::absolute(p);
-        } catch (const fs::filesystem_error& e) {
-            g_warning("Unable to convert path %s to absolute path: %s", app_data->optFilename[0], e.what());
-        }
-    } else if (app_data->control->getSettings()->isAutoloadMostRecent()) {
+    
+    if (app_data->optFilename &&
+        g_strv_length(app_data->optFilename) == 1 &&
+        g_str_has_prefix(app_data->optFilename[0], "xournalexam://")) {
+    
+        XojMsgBox::showErrorToUser(
+                GTK_WINDOW(app_data->win->getWindow()),
+                std::string("MoodleExam-Aufruf erkannt:\n") +
+                        app_data->optFilename[0]);
+    
+    } else if (app_data->optFilename) {
         auto most_recent = RecentManager::getMostRecent();
         if (most_recent) {
             if (auto opt = Util::fromUri(gtk_recent_info_get_uri(most_recent.get()))) {
