@@ -1,0 +1,16 @@
+name: MoodleExam Windows Build
+
+on:
+  workflow_dispatch: {}
+
+jobs:
+  windows:
+    uses: ./.github/workflows/make-installer-windows.yml
+    with:
+      runner: windows-latest
+      displayed_name: MoodleExam Windows x64
+      msystem: MINGW64
+      msys_package_env: MINGW_PACKAGE_PREFIX=mingw-w64-x86_64
+      publish_portable_version: true
+      head_sha: ${{ github.sha }}
+      build_type: RelWithDebInfo
