@@ -9,7 +9,7 @@ jobs:
     with:
       runner: windows-2022
       displayed_name: MoodleExam Windows x64
-      msystem: MINGW64
+      msystem: mingw64
       msys_package_env: x86_64
       publish_portable_version: true
       head_sha: ${{ github.sha }}
