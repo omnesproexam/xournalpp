@@ -75,6 +75,10 @@ cp -r "$prefix"/share/gtksourceview-4 "$setup_dir"/share
 echo "copy gspawn-win64-helper"
 cp "$prefix"/bin/gspawn-win64-helper{,-console}.exe "$setup_dir"/bin/
 
+echo "copy GIO network modules"
+mkdir -p "$setup_dir"/lib/gio/modules
+cp "$prefix"/lib/gio/modules/*.dll "$setup_dir"/lib/gio/modules/
+
 echo "copy gdbus"
 cp "$prefix"/bin/gdbus.exe "$setup_dir"/bin
 
