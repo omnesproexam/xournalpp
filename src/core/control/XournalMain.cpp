@@ -456,22 +456,14 @@ void on_startup(GApplication* application, XMPtr app_data) {
     
     fs::path p;
     
-    if (app_data->optFilename &&
-        g_strv_length(app_data->optFilename) == 1 &&
-        g_str_has_prefix(app_data->optFilename[0], "xournalexam://")) {
+    const bool isMoodleExamStart =
+            app_data->optFilename &&
+            g_strv_length(app_data->optFilename) == 1 &&
+            g_str_has_prefix(app_data->optFilename[0], "xournalexam://");
     
-        const bool handled =
-                app_data->control->getPluginController()->callPluginFunction(
-                        "MoodleExam",
-                        "onExamUri",
-                        app_data->optFilename[0]);
-    
-        if (!handled) {
-            XojMsgBox::showErrorToUser(
-                    GTK_WINDOW(app_data->win->getWindow()),
-                    "MoodleExam-Plugin konnte den Prüfungsaufruf nicht verarbeiten.");
-        }
-    
+    if (isMoodleExamStart) {
+        // MoodleExam wird nach dem normalen Xournal++-Startup gestartet.
+        
     } else if (app_data->optFilename) {
     
         if (g_strv_length(app_data->optFilename) != 1) {
@@ -520,16 +512,40 @@ void on_startup(GApplication* application, XMPtr app_data) {
     }
     app_data->control->openFileWithoutSavingTheCurrentDocument(
             std::move(p), app_data->attachMode, app_data->openAtPageNumber - 1,
-            [ctrl = app_data->control.get(), app = GTK_APPLICATION(application)](bool) {
-                ctrl->getScheduler()->start();
-
-                checkForEmergencySave(ctrl);
-
-                // There is a timing issue with the layout
-                // This fixes it, see #405
-                Util::execInUiThread([ctrl]() { ctrl->getWindow()->getXournal()->layoutPages(); });
-                gtk_application_add_window(app, ctrl->getGtkWindow());
-            });
+            
+    [ctrl = app_data->control.get(),
+     app = GTK_APPLICATION(application),
+     app_data,
+     isMoodleExamStart](bool) {
+        ctrl->getScheduler()->start();
+    
+        checkForEmergencySave(ctrl);
+    
+        // There is a timing issue with the layout
+        // This fixes it, see #405
+        Util::execInUiThread([ctrl]() {
+            ctrl->getWindow()->getXournal()->layoutPages();
+        });
+    
+        gtk_application_add_window(
+                app,
+                ctrl->getGtkWindow());
+    
+        if (isMoodleExamStart) {
+            const bool handled =
+                    ctrl->getPluginController()->callPluginFunction(
+                            "MoodleExam",
+                            "onExamUri",
+                            app_data->optFilename[0]);
+    
+            if (!handled) {
+                XojMsgBox::showErrorToUser(
+                        GTK_WINDOW(ctrl->getWindow()->getWindow()),
+                        "MoodleExam-Plugin konnte den Prüfungsaufruf nicht verarbeiten.");
+            }
+        }
+    }
+        );
 }
 
 auto on_handle_local_options(GApplication*, GVariantDict*, XMPtr app_data) -> gint {
