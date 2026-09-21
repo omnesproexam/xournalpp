@@ -50,6 +50,14 @@ public:
      */
     void showPluginManager() const;
 
+    /**
+     * Call a string callback on an enabled plugin identified by name.
+     * Returns true if the plugin was found and the Lua callback succeeded.
+     */
+    bool callPluginFunction(const std::string& pluginName,
+                            const std::string& functionName,
+                            const std::string& argument);
+
 private:
     /**
      * The main controller
