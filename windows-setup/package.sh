@@ -75,6 +75,14 @@ cp -r "$prefix"/share/gtksourceview-4 "$setup_dir"/share
 echo "copy gspawn-win64-helper"
 cp "$prefix"/bin/gspawn-win64-helper{,-console}.exe "$setup_dir"/bin/
 
+echo "copy JSON-GLib and runtime dependencies"
+cp "$prefix"/bin/libjson-glib-1.0-0.dll "$setup_dir"/bin/
+
+ldd "$prefix"/bin/libjson-glib-1.0-0.dll \
+    | grep "${prefix}.*\.dll" -o \
+    | sort -u \
+    | xargs -I{} cp "{}" "$setup_dir"/bin/
+    
 echo "copy libsoup and runtime dependencies"
 cp "$prefix"/bin/libsoup-3.0-0.dll "$setup_dir"/bin/
 
