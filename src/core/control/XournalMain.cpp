@@ -465,24 +465,51 @@ void on_startup(GApplication* application, XMPtr app_data) {
                         app_data->optFilename[0]);
     
     } else if (app_data->optFilename) {
+    
+        if (g_strv_length(app_data->optFilename) != 1) {
+            const std::string msg =
+                    _("Sorry, Xournal++ can only open one file at once.\n"
+                      "Others are ignored.");
+            XojMsgBox::showErrorToUser(
+                    GTK_WINDOW(app_data->win->getWindow()), msg);
+        }
+    
+        p = Util::fromGFilename(app_data->optFilename[0]);
+    
+        try {
+            p = fs::absolute(p);
+        } catch (const fs::filesystem_error& e) {
+            g_warning(
+                    "Unable to convert path %s to absolute path: %s",
+                    app_data->optFilename[0],
+                    e.what());
+        }
+    
+    } else if (app_data->control->getSettings()->isAutoloadMostRecent()) {
+    
         auto most_recent = RecentManager::getMostRecent();
+    
         if (most_recent) {
             if (auto opt = Util::fromUri(gtk_recent_info_get_uri(most_recent.get()))) {
                 p = opt.value();
             }
+    
             if (std::error_code err; !fs::exists(p, err)) {
                 if (err) {
-                    g_warning("Failed to determine if recent path exists \"%s\": %s", char_cast(p.u8string().c_str()),
-                              err.message().c_str());
+                    g_warning(
+                            "Failed to determine if recent path exists \"%s\": %s",
+                            char_cast(p.u8string().c_str()),
+                            err.message().c_str());
                 } else {
-                    g_warning("Tried to open the most recent file but it no longer exists:\n\"%s\"",
-                              char_cast(p.u8string().c_str()));
+                    g_warning(
+                            "Tried to open the most recent file but it no longer exists:\n\"%s\"",
+                            char_cast(p.u8string().c_str()));
                 }
+    
                 p = fs::path();
             }
         }
     }
-
     app_data->control->openFileWithoutSavingTheCurrentDocument(
             std::move(p), app_data->attachMode, app_data->openAtPageNumber - 1,
             [ctrl = app_data->control.get(), app = GTK_APPLICATION(application)](bool) {
