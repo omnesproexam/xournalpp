@@ -33,6 +33,7 @@
 #include "gui/MainWindow.h"                  // for MainWindow
 #include "gui/XournalView.h"                 // for XournalView
 #include "model/Document.h"                  // for Document
+#include "plugin/PluginController.h"         // für MoodleExam
 #include "undo/EmergencySaveRestore.h"       // for EmergencySaveRestore
 #include "undo/UndoRedoHandler.h"            // for UndoRedoHandler
 #include "util/PathUtil.h"                   // for getConfigFolder, openFil...
@@ -459,10 +460,17 @@ void on_startup(GApplication* application, XMPtr app_data) {
         g_strv_length(app_data->optFilename) == 1 &&
         g_str_has_prefix(app_data->optFilename[0], "xournalexam://")) {
     
-        XojMsgBox::showErrorToUser(
-                GTK_WINDOW(app_data->win->getWindow()),
-                std::string("MoodleExam-Aufruf erkannt:\n") +
+        const bool handled =
+                app_data->control->getPluginController()->callPluginFunction(
+                        "MoodleExam",
+                        "onExamUri",
                         app_data->optFilename[0]);
+    
+        if (!handled) {
+            XojMsgBox::showErrorToUser(
+                    GTK_WINDOW(app_data->win->getWindow()),
+                    "MoodleExam-Plugin konnte den Prüfungsaufruf nicht verarbeiten.");
+        }
     
     } else if (app_data->optFilename) {
     
