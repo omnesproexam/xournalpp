@@ -121,7 +121,11 @@ auto main(int argc, char* argv[]) -> int {
         std::vector<const char*> subargv;
         std::cout << Util::getExePath() << std::endl;
 
+#ifdef _WIN32
+        const std::u8string path = (Util::getExePath() / "examenda").u8string();
+#else
         const std::u8string path = (Util::getExePath() / "xournalpp").u8string();
+#endif
         subargv.emplace_back(char_cast(path.c_str()));  // Data is owned by `path` - Do not delete it
         errorlog << "Executing \"" << char_cast(path);
 
