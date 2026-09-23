@@ -33,7 +33,7 @@
 #include "gui/MainWindow.h"                  // for MainWindow
 #include "gui/XournalView.h"                 // for XournalView
 #include "model/Document.h"                  // for Document
-#include "plugin/PluginController.h"         // für MoodleExam
+#include "plugin/PluginController.h"         // für OmnIXam Examenda
 #include "undo/EmergencySaveRestore.h"       // for EmergencySaveRestore
 #include "undo/UndoRedoHandler.h"            // for UndoRedoHandler
 #include "util/PathUtil.h"                   // for getConfigFolder, openFil...
@@ -456,13 +456,13 @@ void on_startup(GApplication* application, XMPtr app_data) {
     
     fs::path p;
     
-    const bool isMoodleExamStart =
-            app_data->optFilename &&
-            g_strv_length(app_data->optFilename) == 1 &&
-            g_str_has_prefix(app_data->optFilename[0], "xournalexam://");
-    
-    if (isMoodleExamStart) {
-        // MoodleExam wird nach dem normalen Xournal++-Startup gestartet.
+    const bool isOmnIXamStart =
+        app_data->optFilename &&
+        g_strv_length(app_data->optFilename) == 1 &&
+        g_str_has_prefix(app_data->optFilename[0], "omnixam://");
+
+    if (isOmnIXamStart) {
+        // OmnIXam Examenda wird nach dem normalen Startup gestartet.
         
     } else if (app_data->optFilename) {
     
@@ -516,7 +516,7 @@ void on_startup(GApplication* application, XMPtr app_data) {
     [ctrl = app_data->control.get(),
      app = GTK_APPLICATION(application),
      app_data,
-     isMoodleExamStart](bool) {
+     isOmnIXamStart](bool) {
         ctrl->getScheduler()->start();
     
         checkForEmergencySave(ctrl);
@@ -531,18 +531,17 @@ void on_startup(GApplication* application, XMPtr app_data) {
                 app,
                 ctrl->getGtkWindow());
     
-        if (isMoodleExamStart) {
+        if (isOmnIXamStart) {
             const bool handled =
-                    ctrl->getPluginController()->callPluginFunction(
-                            "MoodleExam",
-                            "onExamUri",
-                            app_data->optFilename[0]);
-    
-            if (!handled) {
-                XojMsgBox::showErrorToUser(
-                        GTK_WINDOW(ctrl->getWindow()->getWindow()),
-                        "MoodleExam-Plugin konnte den Prüfungsaufruf nicht verarbeiten.");
-            }
+                ctrl->getPluginController()->callPluginFunction(
+                    "OmnIXamExamenda",
+                    "onExamUri",
+                    app_data->optFilename[0]);
+
+        if (!handled) {
+            XojMsgBox::showErrorToUser(
+                GTK_WINDOW(ctrl->getWindow()->getWindow()),
+                "OmnIXam Examenda konnte den Prüfungsaufruf nicht verarbeiten.");
         }
     }
         );
