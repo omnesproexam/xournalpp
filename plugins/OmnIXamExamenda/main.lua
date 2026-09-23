@@ -1,12 +1,11 @@
 local API_URL =
-    "https://exam.self-learning.ch/local/xournalexam/api.php"
+    "https://exam.self-learning.ch/local/omnixamexamenda/api.php"
 
 local EXAM_FILE_URL =
-    "https://exam.self-learning.ch/local/xournalexam/examfile.php"
+    "https://exam.self-learning.ch/local/omnixamexamenda/examfile.php"
 
 local SUBMISSION_URL =
-    "https://exam.self-learning.ch/local/xournalexam/submission.php"
-
+    "https://exam.self-learning.ch/local/omnixamexamenda/submission.php"
 
 local examSession = nil
 
@@ -319,7 +318,7 @@ local function downloadExamPdf(exam)
 
     local workDir =
         baseDir ..
-        "\\MoodleExam\\sessions\\cmid-" ..
+        "\\OmnIXam\\sessions\\cmid-" ..
         tostring(exam.cmid) ..
         "-user-" ..
         tostring(exam.userid)
@@ -333,7 +332,7 @@ local function downloadExamPdf(exam)
     if mkdirResult ~= 0 then
 
         error(
-            "Der MoodleExam-Arbeitsordner konnte nicht erstellt werden.\n\n" ..
+            "Der OmnIXam-Arbeitsordner konnte nicht erstellt werden.\n\n" ..
             workDir
         )
 
@@ -497,12 +496,12 @@ local function uploadSolution(action)
         message:get_request_headers()
 
     headers:replace(
-        "X-XournalExam-Session",
+        "X-OmnIXam-Session",
         examSession.sessionkey
     )
 
     headers:replace(
-        "X-XournalExam-Action",
+        "X-OmnIXam-Action",
         action
     )
 
@@ -698,7 +697,7 @@ function onExamUri(uri)
        code == "" then
 
         showError(
-            "Ungültiger MoodleExam-Aufruf.\n\n" ..
+            "Ungültiger OmnIXam-Aufruf.\n\n" ..
             "Es wurde kein Startcode gefunden."
         )
 
@@ -762,7 +761,7 @@ function onExamUri(uri)
 
         showError(
             "Die Aufgaben-PDF wurde heruntergeladen,\n" ..
-            "konnte aber nicht in Xournal++ geöffnet werden.\n\n" ..
+            "konnte aber nicht in Examenda geöffnet werden.\n\n" ..
             tostring(openResult)
         )
 
