@@ -93,6 +93,12 @@ set_target_properties(xournalpp PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BIN
         WIN32_EXECUTABLE $<IF:$<PLATFORM_ID:Windows>,TRUE,${CMAKE_WIN32_EXECUTABLE}>
         )
 if (WIN32)
+    set_target_properties(xournalpp PROPERTIES
+        OUTPUT_NAME "examenda"
+    )
+endif()
+
+if (WIN32)
   # Make sure Windows executable has all symbols
   target_link_options(xournalpp PRIVATE "-Wl,--export-all-symbols")
 endif()
