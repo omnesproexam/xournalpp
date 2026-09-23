@@ -77,10 +77,10 @@ jobs:
           mv xournalpp-setup.exe "$INSTALLER_FILENAME"
           echo "artifact=$INSTALLER_FILENAME" >> $GITHUB_OUTPUT
 
-          if [ ${{ inputs.publish_portable_version }} ]; then
-            mkdir portable_content/
-            mv dist "portable_content/xournalpp-$FULL_VERSION_STRING-windows-portable-$ARCH"
-          fi
+        if [ ${{ inputs.publish_portable_version }} ]; then
+          mkdir portable_content/
+          mv dist "portable_content/OmnIXam-Examenda-$FULL_VERSION_STRING-windows-portable-$ARCH"
+        fi
       - name: 'Publish package'
         id: publish
         uses: actions/upload-artifact@v6
