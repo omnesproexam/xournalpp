@@ -1,4 +1,4 @@
-name: MoodleExam Windows Build
+name: OmnIXam Examenda Windows Build
 
 on:
   workflow_dispatch: {}
@@ -8,7 +8,7 @@ jobs:
     uses: ./.github/workflows/make-installer-windows.yml
     with:
       runner: windows-2022
-      displayed_name: MoodleExam Windows x64
+      displayed_name: OmnIXam Examenda Windows x64
       msystem: mingw64
       msys_package_env: x86_64
       publish_portable_version: true
