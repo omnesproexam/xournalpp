@@ -511,42 +511,44 @@ void on_startup(GApplication* application, XMPtr app_data) {
         }
     }
     app_data->control->openFileWithoutSavingTheCurrentDocument(
-            std::move(p), app_data->attachMode, app_data->openAtPageNumber - 1,
-            
-    [ctrl = app_data->control.get(),
-     app = GTK_APPLICATION(application),
-     app_data,
-     isOmnIXamStart](bool) {
-        ctrl->getScheduler()->start();
-    
-        checkForEmergencySave(ctrl);
-    
-        // There is a timing issue with the layout
-        // This fixes it, see #405
-        Util::execInUiThread([ctrl]() {
-            ctrl->getWindow()->getXournal()->layoutPages();
-        });
-    
-        gtk_application_add_window(
-                app,
-                ctrl->getGtkWindow());
-    
-        if (isOmnIXamStart) {
-            const bool handled =
-                ctrl->getPluginController()->callPluginFunction(
-                    "OmnIXamExamenda",
-                    "onExamUri",
-                    app_data->optFilename[0]);
+            std::move(p),
+            app_data->attachMode,
+            app_data->openAtPageNumber - 1,
 
-        if (!handled) {
-            XojMsgBox::showErrorToUser(
-                GTK_WINDOW(ctrl->getWindow()->getWindow()),
-                "OmnIXam Examenda konnte den Prüfungsaufruf nicht verarbeiten.");
-        }
-    }
-        );
+            [ctrl = app_data->control.get(),
+             app = GTK_APPLICATION(application),
+             app_data,
+             isOmnIXamStart](bool) {
+
+                ctrl->getScheduler()->start();
+
+                checkForEmergencySave(ctrl);
+
+                // There is a timing issue with the layout
+                // This fixes it, see #405
+                Util::execInUiThread([ctrl]() {
+                    ctrl->getWindow()->getXournal()->layoutPages();
+                });
+
+                gtk_application_add_window(
+                        app,
+                        ctrl->getGtkWindow());
+
+                if (isOmnIXamStart) {
+                    const bool handled =
+                            ctrl->getPluginController()->callPluginFunction(
+                                    "OmnIXamExamenda",
+                                    "onExamUri",
+                                    app_data->optFilename[0]);
+
+                    if (!handled) {
+                        XojMsgBox::showErrorToUser(
+                                GTK_WINDOW(ctrl->getWindow()->getWindow()),
+                                "OmnIXam Examenda konnte den Prüfungsaufruf nicht verarbeiten.");
+                    }
+                }
+            });
 }
-
 auto on_handle_local_options(GApplication*, GVariantDict*, XMPtr app_data) -> gint {
     initCAndCoutLocales();
 
